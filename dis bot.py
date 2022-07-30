@@ -1,58 +1,85 @@
-import os
+import random
 import discord
 from discord.ext import commands
-from discord.ext.commands import Bot
-from config import settings
-import asyncio
+from bs4 import BeautifulSoup
 import requests
 import random
-from discord_webhook import DiscordWebhook
-from bs4 import BeautifulSoup
 
+config = {
+    'token': 'YOUR TOKEN',
+    "guild": "768849576811036743",
+    'bot': 'neuropostironyBoty',
+    'id': 777649034424746014,
+    'prefix': '/'
+}
 
-client = discord.Client()
-url = 'http://anekdotov.net/'
 headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.192 Safari/537.36 OPR/74.0.3911.218'
       }
 
-def parser(num):
-    response = requests.get(url)  
-    html = response.content                             
-    soup = BeautifulSoup(html, "lxml") 
-    aneki = []   
-    anek_list = soup.find_all('div', {'class':"anekdot"})
-    for i in anek_list:
-     aneki.append(i)
-    anek = str(aneki[num]).replace('<div class="anekdot">', '').replace('</div>', '').replace('<br/>' , '')
-    msg = anek
+bot = commands.Bot(command_prefix=config['prefix'])
 
-    return msg
 
-@client.event
+@bot.command()
+@commands.has_role("ЦАРЬ И БОГ")
+async def anek(ctx, *arg):
+    if not arg:
+        text = parser(random.randint(1, 1139))
+    else:
+        if int(arg[0]) < 1 or int(arg[0]) > 1139:
+            await ctx.send("Столько нету")
+            return
+        else:
+            text = parser(arg[0])
+    await ctx.send("внимание анек")
+    await ctx.send(text)
+
+
+def parser(number):
+    response = requests.get(url=f'https://baneks.ru/{number}')
+    soup = BeautifulSoup(response.text, "html.parser")
+    text = soup.find("meta", {"name": "description"})['content']
+    return text
+
+
+@bot.command()
+@commands.has_role("ЦАРЬ И БОГ")
+async def chill(ctx, *arg):
+    await ctx.send(file=discord.File('chill.gif'))
+
+
+@bot.command()
+@commands.has_role("ЦАРЬ И БОГ")
+async def gensh(ctx, *arg):
+    await ctx.send(file=discord.File('genshin.gif'))
+
+
+@bot.command()
+@commands.has_role("ЦАРЬ И БОГ")
+@commands.has_role("качок")
+async def ger(ctx, *arg):
+    await ctx.send(file=discord.File('ger.gif'))
+
+
+@bot.command()
+@commands.has_role("ЦАРЬ И БОГ")
+async def renochka(ctx, *arg):
+    await ctx.send(file=discord.File('video(1).gif'))
+
+
+@bot.command()
+@commands.has_role("ЦАРЬ И БОГ")
+async def nikita_nedovolen(ctx, *arg):
+    await ctx.send(file=discord.File('1.png'))
+
+
+@bot.event
 async def on_ready():
     print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
+    print(bot.user.name)
+    print(bot.user.id)
     print('------')
 
 
-num = 0
-@client.event
-async def on_message(message):
-    if message.content.startswith('') and message.author.id != client.user.id and message.content.startswith('') != message.content.startswith('/'):
-        channel = message.channel
-        global n, number
-    if message.content.startswith('/ane'):
-        global num
-        channel = message.channel
-        await channel.send(parser(num))
-        num += 1
-        if num == 15:
-            num = 0
-    if message.content.startswith('/qwe'):              #svastika
-        channel = message.channel 
-        await channel.send(file=discord.File('1.png'))
-
-client.run(settings['token'])
+bot.run(config['token'])
 

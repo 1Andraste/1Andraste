@@ -42,11 +42,11 @@ def get_page(url):
     try:
         response = requests.get(url, headers=headers)
     except requests.exceptions.Timeout:
-        print('KILLLLLLL')
+        print("Error1")
     except requests.exceptions.TooManyRedirects:
-        print("NNNNNNNNNNNN")
+        print("Error2")
     except requests.exceptions.RequestException:
-        print('IIIIIIIIIIIIIGER')
+        print("Error3")
     soup = BeautifulSoup(response.content, "html.parser")
     script = soup.find_all('script')[-2].text.strip()
     data = json.loads(script)
@@ -55,11 +55,11 @@ def get_page(url):
         try:
             response2 = requests.get(data['items']['catalogItems']['byId'][f"{ids[i]}"]['url'], headers=headers)
         except requests.exceptions.Timeout:
-            print('2KILLLLLLL')
+            print('Error11')
         except requests.exceptions.TooManyRedirects:
-            print("2NNNNNNNNNNNN")
+            print("Error22")
         except requests.exceptions.RequestException:
-            print('2IIIIIIIIIIIIIGER')
+            print('Error33')
         soup2 = BeautifulSoup(response2.content, "html.parser")
         div = soup2.find_all('div')
         for k in div:
